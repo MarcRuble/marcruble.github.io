@@ -81,7 +81,8 @@ var Game = function (_React$Component2) {
 
     _this3.state = {
       history: [{
-        squares: Array(9).fill(null)
+        squares: Array(9).fill(null),
+        selected: { row: -1, col: -1 }
       }],
       stepNumber: 0,
       xIsNext: true
@@ -101,7 +102,8 @@ var Game = function (_React$Component2) {
       squares[i] = this.state.xIsNext ? 'X' : 'O';
       this.setState({
         history: history.concat([{
-          squares: squares
+          squares: squares,
+          selected: { row: (i%3)+1, col: Math.floor(i/3)+1 }
         }]),
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext
@@ -125,15 +127,28 @@ var Game = function (_React$Component2) {
       var winner = calculateWinner(current.squares);
 
       var moves = history.slice(0, this.state.stepNumber).map(function (step, move) {
-        var desc = move ? 'Go to move #' + move : 'Go to game start';
+        const currentPlayer = move % 2 === 0 ? 'O' : 'X';
+        const row = step.selected.row;
+        const col = step.selected.col;
+        var desc = move ? `Go to move ${currentPlayer}(${row},${col})`
+                        : 'Go to game start';
         return React.createElement(
           "li",
           { key: move },
           React.createElement(
             "button",
-            { onClick: function onClick() {
+            { 
+              className: "history-button",
+              onClick: function onClick() {
                 return _this4.jumpTo(move);
-              } },
+              },
+              onMouseEnter: function onMouseEnter(e) {
+                e.target.style.fontWeight = 'bold';
+              },
+              onMouseLeave: function onMouseLeave(e) {
+                e.target.style.fontWeight = 'normal';
+              }
+            },
             desc
           )
         );
